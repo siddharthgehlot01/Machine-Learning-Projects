@@ -1,0 +1,29 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Dec  6 01:07:32 2020
+
+@author: sgehlot
+"""
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+data = pd.read_csv("alteryxOutput/educationcovidcorr.csv") 
+
+cordata=data.iloc[:,[2,5]].values
+cordata=pd.DataFrame(cordata,columns=["education value","covid cases value"])
+
+
+correlation=cordata.corr()
+
+plt.scatter(cordata['education value'],cordata['covid cases value'])
+sns.lmplot(x='education value',y='covid cases value',data=cordata)
+
+sns.heatmap(correlation,square=True,cmap=plt.cm.seismic)
+plt.yticks(rotation=0)
+plt.xticks(rotation=90)
+plt.xlabel('Education enrollment')
+plt.ylabel('covid cases')
+plt.show()
+
