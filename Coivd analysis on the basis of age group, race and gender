@@ -1,0 +1,193 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Dec  2 09:31:50 2020
+
+@author: sgehlot
+"""
+
+import numpy as np 
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+#read data
+covidData=pd.read_csv("COVID-19_Case_Surveillance_Public_Use_Data.csv")
+# as data is large take a sample to work on 
+#Analyze_data=covidData.sample(n=100000,random_state=123)
+#analyze data
+#print(covidData.info())
+"""RangeIndex: 5760066 entries, 0 to 5760065
+Data columns (total 11 columns):
+cdc_report_dt                    object
+pos_spec_dt                      object
+onset_dt                         object
+current_status                   object
+sex                              object
+age_group                        object
+Race and ethnicity (combined)    object
+hosp_yn                          object
+icu_yn                           object
+death_yn                         object
+medcond_yn                       object
+"""
+#print(covidData.describe())
+"""
+       cdc_report_dt pos_spec_dt    onset_dt  ...   icu_yn death_yn medcond_yn
+count        5760066     1904712     3065407  ...  5760066  5760066    5760066
+unique           286         269         304  ...        4        4          4
+top       2020/06/24  2020/04/06  2020/07/06  ...  Missing       No    Missing
+freq          155484       17952       26944  ...  4153363  2662955    3976510
+"""
+#check for missing values
+#print(covidData.isnull().sum())
+"""
+cdc_report_dt                          0
+pos_spec_dt                      3855354
+onset_dt                         2694659
+current_status                         0
+sex                                   15
+age_group                             92
+Race and ethnicity (combined)         10
+hosp_yn                                0
+icu_yn                                 0
+death_yn                               0
+medcond_yn                             0
+dtype: int64
+"""
+#age_group assign age within range of description randomly
+
+
+covidData.reset_index(drop=True)
+
+age=[]
+for i in range(0,len(covidData)):
+    if(covidData['age_group'][i]=="0 - 9 Years"):
+        age.append(np.random.randint(1,9))
+        #covidData['age_group'][i]=np.random.randint(1,9)
+    if(covidData['age_group'][i]=="10 - 19 Years"):
+        age.append(np.random.randint(10,19))
+        #covidData['age_group'][i]=np.random.randint(10,19)
+    if(covidData['age_group'][i]=="20 - 29 Years"):
+        age.append(np.random.randint(20,29))
+        #covidData['age_group'][i]=np.random.randint(20,29)
+    if(covidData['age_group'][i]=="30 - 39 Years"):
+        age.append(np.random.randint(30,39))
+        #covidData['age_group'][i]=np.random.randint(30,39)
+    if(covidData['age_group'][i]=="40 - 49 Years"):
+        age.append(np.random.randint(40,49))
+        #covidData['age_group'][i]=np.random.randint(40,49)
+    if(covidData['age_group'][i]=="50 - 59 Years"):
+        age.append(np.random.randint(50,59))
+        #covidData['age_group'][i]=np.random.randint(50,59)
+    if(covidData['age_group'][i]=="60 - 69 Years"):
+        age.append(np.random.randint(60,69))
+        #covidData['age_group'][i]=np.random.randint(60,69)
+    if(covidData['age_group'][i]=="70 - 79 Years"):
+        age.append(np.random.randint(70,79))
+       #covidData['age_group'][i]=np.random.randint(70,79)
+    if(covidData['age_group'][i]=="80+ Years"):
+        age.append(np.random.randint(80,100))
+        #covidData['age_group'][i]=np.random.randint(80,100)
+    if(covidData['age_group'][i]=="Unknown" or covidData['age_group'][i]==np.nan or covidData['age_group'][i]=='0'):
+        age.append(0)
+        #covidData['age_group'][i]=0
+    
+
+ages=np.array(age).reshape(len(covidData),1)
+covidData['randomAge']=ages  
+    
+   
+   
+
+covidData=covidData[covidData['sex'].notnull()]
+covidData['sex'].dropna()
+covidData=covidData[covidData['age_group'].notnull()]
+#print(covidData.isnull().sum())
+"""
+cdc_report_dt                          0
+pos_spec_dt                      3855287
+onset_dt                         2694627
+current_status                         0
+sex                                    0
+age_group                              0
+Race and ethnicity (combined)          0
+hosp_yn                                0
+icu_yn                                 0
+death_yn                               0
+medcond_yn                             0
+"""
+#further data cleansing
+#age_group filter out NA and unknown
+covidData=covidData[(covidData['age_group']!="NA")]
+covidData=covidData[(covidData['age_group']!="Unknown")]
+covidData=covidData[(covidData['age_group']!="Missing")]
+#filter Race and ethincity for NA and unknown
+covidData =covidData[(covidData['Race and ethnicity (combined)']!="NA")]
+covidData =covidData[(covidData['Race and ethnicity (combined)']!="Unknown")]
+covidData =covidData[(covidData['Race and ethnicity (combined)']!="Missing")]
+#filter hosp_yn for Missing and Unknown
+covidData =covidData[(covidData['hosp_yn']!="NA")]
+covidData =covidData[(covidData['hosp_yn']!="Unknown")]
+covidData =covidData[(covidData['hosp_yn']!="Missing")]
+#filter icu_yn for Missing and Unknown
+covidData =covidData[(covidData['icu_yn']!="NA")]
+covidData =covidData[(covidData['icu_yn']!="Unknown")]
+covidData =covidData[(covidData['icu_yn']!="Missing")]
+#filter death_yn for Missing and Unknown
+covidData =covidData[(covidData['death_yn']!="NA")]
+covidData =covidData[(covidData['death_yn']!="Unknown")]
+covidData =covidData[(covidData['death_yn']!="Missing")]
+#filter medcond_yn for Missing and Unknown
+covidData =covidData[(covidData['medcond_yn']!="NA")]
+covidData =covidData[(covidData['medcond_yn']!="Unknown")]
+covidData =covidData[(covidData['medcond_yn']!="Missing")]
+
+covidData=covidData[covidData['sex']!=0]
+
+# dataset to be considered 
+X=covidData.iloc[:,[4,11]].values
+Y=covidData.iloc[:,9].values
+
+#OneHotEncoder to the independent variable
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+colTrans=ColumnTransformer(transformers=[("encoder",OneHotEncoder(),[0])],remainder='passthrough')
+X=np.array(colTrans.fit_transform(X))
+#print(x)
+
+from sklearn.preprocessing import LabelEncoder
+le =LabelEncoder()
+Y=le.fit_transform(Y)
+
+#split train test data
+from sklearn.model_selection import train_test_split
+xtrain,xtest,ytrain,ytest=train_test_split(X,Y,test_size=0.25)
+
+
+# fit logistic regression
+from sklearn.linear_model import LogisticRegression
+lr =LogisticRegression(random_state=0)
+lr.fit(xtrain,ytrain)
+
+#predict test set
+y_pred = lr.predict(xtest)
+
+from sklearn.metrics import confusion_matrix,accuracy_score
+cm=confusion_matrix(ytest,y_pred)
+acc=accuracy_score(ytest,y_pred)
+
+#apply cross validation
+from sklearn.model_selection import cross_val_score
+acc_cross=cross_val_score(estimator=lr,X=xtrain,y=ytrain,cv=10)
+final_acc=acc_cross.mean()*100
+
+
+
+#result=np.concatenate(xtest,ytest.reshape(len(xtest),1),y_pred.reshape(len(xtest),1))
+
+
+
+
+
+
+
