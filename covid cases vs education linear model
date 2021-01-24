@@ -1,0 +1,57 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Dec  6 03:38:24 2020
+
+@author: sgehlot
+"""
+
+#Linear Regression & Random forest Regression on education and covid data
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+data = pd.read_csv("alteryxOutput/educationcovidcorr.csv") 
+
+data=data.iloc[:,[2,5]].values
+data=pd.DataFrame(data,columns=["education value","covid cases value"])
+
+
+#identify independent and dependent data
+x=data.iloc[:,[0]].values
+y=data.iloc[:,[1]].values
+
+#split data
+from sklearn.model_selection import train_test_split
+xtrain,xtest,ytrain,ytest=train_test_split(x,y,test_size=0.25)
+
+
+
+#apply linear regression
+#from sklearn.ensemble import RandomForestRegressor
+#rfr=RandomForestRegressor(n_estimators=10,random_state=123)
+#rfr.fit(xtrain,ytrain)
+
+from sklearn.linear_model import LinearRegression
+lr=LinearRegression()
+lr.fit(xtrain,ytrain)
+
+#predict the test set
+#y_pred=rfr.predict(xtest)
+y_pred=lr.predict(xtest)
+
+
+#plot the linear model
+plt.scatter(xtest,ytest,color='red')
+plt.plot(xtest,y_pred,color='blue')
+plt.title('Education enrollment vs covid cases for each US county')
+plt.xlabel('Education enrollment')
+plt.ylabel('covid cases ')
+plt.show()
+
+
+#apply cross validation
+from sklearn.model_selection import cross_val_score
+acc_cross=cross_val_score(estimator=lr,X=xtrain,y=ytrain,cv=10)
+final_acc=acc_cross.mean()*100
+
