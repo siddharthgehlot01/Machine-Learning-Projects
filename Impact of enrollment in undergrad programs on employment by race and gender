@@ -1,1 +1,97 @@
-The hypothesis is to anal
+The hypothesis is to identify enrollment by race and gender who are most deprived of educational facilities.
+--------------------------------------------------------------------------------------------------------------------
+
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Dec  3 08:57:48 2020
+
+@author: sgehlot
+"""
+
+# import python general libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# read NCES university undergrade data
+univData=pd.read_csv("alteryxOutput/NCES_fall_2018_undergrad_race_gender.csv")
+
+# check for null values in data university data set
+print(univData.isnull().sum())
+#dealing with null values
+univData=univData[univData['Grand total (EF2018  All students  Undergraduate total)'].notnull()]
+
+# apply loop to consider only columns for women with different races 
+# first column index for women data is 3 and there after continue the loop to take
+# every column at the increment of 3 till the last column
+list=[]
+for i in range(5,39,3):
+    list.append(i)
+women=pd.DataFrame(univData.iloc[:,list].values)
+
+#select data to choose the cluster for university on basis of gender education 
+
+#create pairplot to visulaize the correlation betwween different women races
+#sns.pairplot(women)
+
+
+for i,j in enumerate(univData.columns):
+    if i in list:
+     print('id: {} column:{}'.format(i,j))
+     
+#following is the data to be considered:
+#id: 5 column:Total women (EF2018  All students  Undergraduate total)
+#id: 8 column:Full time women (EF2018  All students  Undergraduate total)
+#id: 11 column:Part time women (EF2018  All students  Undergraduate total)
+#id: 14 column:Grand total women (EF2018A  All students  Undergraduate total)
+#id: 17 column:American Indian or Alaska Native women (EF2018A  All students  Undergraduate total)
+#id: 20 column:Asian women (EF2018A  All students  Undergraduate total)
+#id: 23 column:Black or African American women (EF2018A  All students  Undergraduate total)
+#id: 26 column:Hispanic women (EF2018A  All students  Undergraduate total)
+#id: 29 column:Native Hawaiian or Other Pacific Islander women (EF2018A  All students  Undergraduate total)
+#id: 32 column:White women (EF2018A  All students  Undergraduate total)
+#id: 35 column:Two or more races women (EF2018A  All students  Undergraduate total)
+#id: 38 column:Race/ethnicity unknown women (EF2018A  All students  Undergraduate total)
+
+
+
+# as seen fro the plot the there should be more focus on education of American Indian & Alaskan Native  women and Black and African women
+# Now to see which university should focus on there education lets create cluster of the university
+
+#data for the American Indian & Alaskan Native  women and Black and African women to be considered for cluster
+AIBAwomen=women.iloc[:,[4,6]].values
+
+#apply k-means on American Indian & Alaskan Native and Black & african women to cluster Academic institute
+from sklearn.cluster import KMeans
+wcss =[]
+for i in range(1,11):
+    km=KMeans(n_clusters=i,init='k-means++',random_state=123)
+    km.fit(AIBAwomen)
+    wcss.append(km.inertia_)
+plt.plot(range(1,11),wcss)
+plt.xlabel('clusters')
+plt.ylabel('wcss')
+plt.show()
+
+#as per the elbow method the number of clusters should be 4
+
+#traing k-means  for 4 clusters
+km4=KMeans(n_clusters=4,init='k-means++',random_state=123)
+y_cluster=km4.fit_predict(AIBAwomen)
+#cluster data as per university
+
+                             
+#plot for clusters 
+plt.scatter(AIBAwomen[y_cluster==0,0],AIBAwomen[y_cluster==0,1],s=100,c='blue',label='Cluster1')
+plt.scatter(AIBAwomen[y_cluster==1,0],AIBAwomen[y_cluster==1,1],s=100,c='green',label='Cluster2')
+plt.scatter(AIBAwomen[y_cluster==2,0],AIBAwomen[y_cluster==2,1],s=100,c='red',label='Cluster3')
+plt.scatter(AIBAwomen[y_cluster==3,0],AIBAwomen[y_cluster==3,1],s=100,c='yellow',label='Cluster4') 
+plt.xlabel('Women: American Indian & AL Native')
+plt.ylabel('Women: Black African')
+plt.legend()
+plt.show()  
+
+#create final result
+univData['cluster']=y_cluster.reshape(len(univData),1)
+cluster_result=pd.DataFrame(univData.loc[:,['Institution Name','cluster']].values)
