@@ -1,0 +1,44 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Dec  4 12:55:41 2020
+
+@author: sgehlot
+"""
+
+import numpy as mp
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+data= pd.read_csv("alteryxOutput/countyeducationcensus.csv")
+
+
+import plotly.io as pio
+pio.renderers.default = 'browser'
+from urllib.request import urlopen
+import json
+with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
+    counties = json.load(response)
+    for i in range(len(counties['features'])):
+       counties['features'][i]['id']= int(counties['features'][i]['id'])
+    
+    
+#if(counties['features'][0]['id'][0]!='0'):
+#  data['state_county_fips']='0'+data['state_county_fips'].astype(str)
+   
+    
+
+import pandas as pd
+
+import plotly.express as px
+
+fig = px.choropleth(     
+        data, geojson=counties, locations='state_county_fips', color='EducatedPopulation(100k)',
+                           color_continuous_scale=px.colors.sequential.Cividis_r,
+                           range_color=(0,10),
+                           scope="usa",
+                           labels={'Education':'No of educated people(100k)'}
+                          )
+#fig.update_geos(fitbounds="locations", visible=False)
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+fig.show()
